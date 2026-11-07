@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Особистий кабінет | IT Support</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <h1>IT Support</h1>
+        <div class="user-info">
+            <span id="user-name">Користувач</span>
+            <a class="profile-link" href="profile.html">Профіль</a>
+            <button id="logout-btn">Вийти</button>
+        </div>
+    </header>
+    <main class="container">
+        <div class="dashboard-controls">
+            <h2>Мої заявки</h2>
+            <a href="create-request.html" class="btn">Створити нову заявку</a>
+        </div>
+        <div class="filters">
+            <input type="text" id="search-requests" placeholder="Пошук за назвою...">
+            <select id="filter-status">
+                <option value="">Всі статуси</option>
+                <option value="new">Нова</option>
+                <option value="in_progress">У роботі</option>
+                <option value="waiting">Очікування</option>
+                <option value="completed">Завершена</option>
+                <option value="rejected">Відхилена</option>
+            </select>
+        </div>
+        <div id="dashboard-message" class="message" role="status" aria-live="polite"></div>
+        <div id="loading-indicator" class="hidden">Завантаження...</div>
+        <table id="user-requests-table">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Дата</th>
+                    <th>Назва / Проблема</th>
+                    <th>Статус</th>
+                    <th>Коментар адміна</th>
+                </tr>
+            </thead>
+            <tbody id="user-requests-body">
+                <!-- Дані завантажуватимуться через JS -->
+            </tbody>
+        </table>
+    </main>
+    <script type="module" src="../js/dashboard.js"></script>
+</body>
+</html>

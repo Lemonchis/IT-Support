@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вхід | IT Support</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container auth-container">
+        <h2>Вхід у систему</h2>
+        <form id="login-form">
+            <label for="login-email">Електронна пошта:</label>
+            <input type="email" id="login-email" required>
+
+            <label for="login-password">Пароль:</label>
+            <input type="password" id="login-password" required>
+
+            <button type="submit">Увійти</button>
+            <div id="login-message" class="message"></div>
+        </form>
+        <p>Немає акаунта? <a href="register.html">Зареєструватися</a></p>
+    </div>
+    <script type="module" src="../js/auth.js"></script>
+</body>
+</html>

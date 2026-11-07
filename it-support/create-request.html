@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Створення заявки | IT Support</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <h1>IT Support</h1>
+        <a href="dashboard.html" class="btn-back">Повернутися до кабінету</a>
+    </header>
+    <main class="container">
+        <h2>Нова заявка на ремонт</h2>
+        <form id="create-request-form">
+            <label for="req-title">Назва заявки:</label>
+            <input type="text" id="req-title" required>
+
+            <label for="req-equipment">Тип обладнання:</label>
+            <select id="req-equipment" required>
+                <option value="Комп'ютер">Комп'ютер</option>
+                <option value="Ноутбук">Ноутбук</option>
+                <option value="Принтер">Принтер</option>
+                <option value="Монітор">Монітор</option>
+                <option value="Інше">Інше</option>
+            </select>
+
+            <label for="req-inventory">Інвентарний номер (за наявності):</label>
+            <input type="text" id="req-inventory">
+
+            <label for="req-location">Кабінет або місце розташування:</label>
+            <input type="text" id="req-location" required>
+
+            <label for="req-description">Опис проблеми:</label>
+            <textarea id="req-description" rows="4" required></textarea>
+
+            <label for="req-phone">Контактний телефон:</label>
+            <input type="tel" id="req-phone" required>
+
+            <button type="submit">Створити заявку</button>
+            <div id="create-message" class="message"></div>
+        </form>
+    </main>
+    <script type="module" src="../js/requests.js"></script>
+</body>
+</html>

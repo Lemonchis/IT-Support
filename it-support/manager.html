@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель Менеджера | IT Support</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Панель Менеджера</h1>
+        <div class="user-info">
+            <span id="manager-name">Менеджер</span>
+            <a class="profile-link" href="profile.html">Профіль</a>
+            <button id="logout-btn">Вийти</button>
+        </div>
+    </header>
+    <main class="container-fluid">
+        <div class="dashboard-controls">
+            <h2>Контроль виконання заявок</h2>
+        </div>
+        <div class="filters">
+            <input type="text" id="manager-search" placeholder="Пошук заявок...">
+            <select id="manager-filter-priority">
+                <option value="">Всі пріоритети</option>
+                <option value="low">Низький</option>
+                <option value="medium">Середній</option>
+                <option value="high">Високий</option>
+                <option value="critical">Критичний</option>
+            </select>
+        </div>
+        <div id="manager-message" class="message" role="status" aria-live="polite"></div>
+        <table id="manager-requests-table">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Дата</th>
+                    <th>Заявник</th>
+                    <th>Проблема</th>
+                    <th>Статус</th>
+                    <th>Пріоритет</th>
+                    <th>Терміни</th>
+                </tr>
+            </thead>
+            <tbody id="manager-requests-body">
+                <!-- Дані завантажуватимуться через JS -->
+            </tbody>
+        </table>
+    </main>
+    <script type="module" src="../js/manager.js"></script>
+</body>
+</html>

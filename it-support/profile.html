@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f0e6">
+    <title>Мій профіль | IT Support</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="admin-page">
+    <header class="app-header">
+        <a class="brand" id="profile-home-link" href="dashboard.html" aria-label="IT Support — повернутися до кабінету">
+            <span class="brand-mark">IT</span>
+            <span><strong>IT Support</strong><small>Особистий профіль</small></span>
+        </a>
+        <div class="user-info">
+            <span id="profile-header-name">Користувач</span>
+            <button id="profile-logout" class="button-secondary" type="button">Вийти</button>
+        </div>
+    </header>
+
+    <main class="profile-layout">
+        <a id="profile-back-link" class="profile-back-link" href="dashboard.html">← Назад до кабінету</a>
+        <section class="profile-hero">
+            <div class="profile-avatar" id="profile-avatar" aria-hidden="true">IT</div>
+            <div class="profile-hero-copy">
+                <p class="eyebrow">ОСОБИСТИЙ ПРОФІЛЬ</p>
+                <h1 id="profile-heading">Ваш профіль</h1>
+                <p>Оновлюйте дані та керуйте безпекою свого акаунта.</p>
+            </div>
+            <span class="profile-role-pill" id="profile-role">Користувач</span>
+        </section>
+
+        <div id="profile-message" class="admin-message hidden" role="status" aria-live="polite"></div>
+
+        <section class="profile-grid">
+            <article class="profile-card profile-details-card">
+                <div class="profile-section-heading">
+                    <span class="profile-section-icon" aria-hidden="true">◎</span>
+                    <div><h2>Інформація про акаунт</h2><p>Ваші дані та активність</p></div>
+                </div>
+
+                <dl class="profile-details">
+                    <div><dt>Електронна пошта</dt><dd id="profile-email">Завантаження…</dd></div>
+                    <div><dt>Роль у системі</dt><dd id="profile-role-detail">Завантаження…</dd></div>
+                    <div><dt>Акаунт створено</dt><dd id="profile-created-at">Завантаження…</dd></div>
+                    <div><dt>Останній вхід</dt><dd id="profile-last-login">Завантаження…</dd></div>
+                </dl>
+
+                <div class="session-card">
+                    <span class="session-pulse" aria-hidden="true"></span>
+                    <div><span class="session-label">Поточний сеанс</span><strong id="profile-session-duration">Підрахунок…</strong></div>
+                </div>
+            </article>
+
+            <article class="profile-card">
+                <div class="profile-section-heading">
+                    <span class="profile-section-icon" aria-hidden="true">✎</span>
+                    <div><h2>Особисті дані</h2><p>Ім’я, яке відображається в заявках</p></div>
+                </div>
+                <form id="profile-name-form" class="profile-form">
+                    <label for="profile-full-name">Ім’я та прізвище</label>
+                    <input type="text" id="profile-full-name" maxlength="100" autocomplete="name" required>
+                    <button class="profile-action-button" type="submit">Зберегти ім’я</button>
+                </form>
+            </article>
+
+            <article class="profile-card">
+                <div class="profile-section-heading">
+                    <span class="profile-section-icon" aria-hidden="true">⌑</span>
+                    <div><h2>Зміна пароля</h2><p>Використовуйте пароль, який ще ніде не застосовували</p></div>
+                </div>
+                <form id="profile-password-form" class="profile-form">
+                    <label for="profile-current-password">Поточний пароль</label>
+                    <input type="password" id="profile-current-password" autocomplete="current-password" required>
+                    <label for="profile-new-password">Новий пароль</label>
+                    <input type="password" id="profile-new-password" minlength="8" autocomplete="new-password" required>
+                    <label for="profile-confirm-password">Повторіть новий пароль</label>
+                    <input type="password" id="profile-confirm-password" minlength="8" autocomplete="new-password" required>
+                    <button class="profile-action-button" type="submit">Оновити пароль</button>
+                </form>
+            </article>
+
+            <article class="profile-card profile-danger-card">
+                <div class="profile-section-heading">
+                    <span class="profile-section-icon profile-danger-icon" aria-hidden="true">!</span>
+                    <div><h2>Видалення акаунта</h2><p>Цю дію неможливо скасувати</p></div>
+                </div>
+                <p class="profile-delete-warning">Під час видалення акаунта всі ваші заявки на підтримку також буде видалено назавжди.</p>
+                <button class="profile-delete-button" id="profile-delete-account" type="button">Видалити акаунт і заявки</button>
+            </article>
+        </section>
+
+        <footer class="admin-footer">IT Support <span>•</span> Налаштування профілю</footer>
+    </main>
+    <script type="module" src="../js/profile.js"></script>
+</body>
+</html>

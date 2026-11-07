@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5f0e6">
+    <title>Панель адміністратора | IT Support</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="admin-page">
+    <header class="app-header">
+        <a class="brand" href="admin.html" aria-label="IT Support — панель адміністратора">
+            <span class="brand-mark">IT</span>
+            <span><strong>IT Support</strong><small>Панель адміністратора</small></span>
+        </a>
+        <div class="user-info">
+            <span id="admin-name">Адміністратор</span>
+            <a class="profile-link" href="profile.html">Профіль</a>
+            <button id="logout-btn" class="button-secondary" type="button">Вийти</button>
+        </div>
+    </header>
+
+    <main class="admin-layout">
+        <section class="admin-welcome">
+            <div>
+                <p class="eyebrow">ПАНЕЛЬ КЕРУВАННЯ</p>
+                <h1>Вітаємо в системі підтримки</h1>
+                <p>Керуйте заявками та користувачами в одному місці.</p>
+            </div>
+            <span class="welcome-icon" aria-hidden="true">✦</span>
+        </section>
+
+        <div id="admin-message" class="admin-message hidden" role="status" aria-live="polite"></div>
+
+        <section class="stats admin-stats" aria-label="Статистика">
+            <article class="stat-card"><span class="stat-icon">✳</span><span class="stat-label">Нові заявки</span><strong id="stat-new">0</strong></article>
+            <article class="stat-card"><span class="stat-icon">◷</span><span class="stat-label">Активні</span><strong id="stat-active">0</strong></article>
+            <article class="stat-card"><span class="stat-icon">✓</span><span class="stat-label">Завершені</span><strong id="stat-completed">0</strong></article>
+            <article class="stat-card"><span class="stat-icon">♙</span><span class="stat-label">Користувачі</span><strong id="stat-users">0</strong></article>
+        </section>
+
+        <section class="admin-workspace">
+            <nav class="admin-tabs" role="tablist" aria-label="Розділи панелі">
+                <button class="admin-tab active" id="requests-tab" type="button" role="tab" aria-selected="true" aria-controls="requests-panel" data-admin-tab="requests">Заявки</button>
+                <button class="admin-tab" id="users-tab" type="button" role="tab" aria-selected="false" aria-controls="users-panel" data-admin-tab="users">Користувачі</button>
+            </nav>
+
+            <section id="requests-panel" class="admin-panel" role="tabpanel" aria-labelledby="requests-tab">
+                <div class="panel-heading">
+                    <div><h2>Заявки на підтримку</h2><p>Переглядайте звернення та оновлюйте їхній статус.</p></div>
+                </div>
+                <div class="filters admin-filters">
+                    <input type="search" id="admin-search" placeholder="Пошук за номером, автором чи назвою..." aria-label="Пошук заявок">
+                    <select id="admin-filter-status" aria-label="Фільтр за статусом">
+                        <option value="">Усі статуси</option>
+                        <option value="new">Нова</option>
+                        <option value="in_progress">У роботі</option>
+                        <option value="waiting">Очікування</option>
+                        <option value="completed">Завершена</option>
+                        <option value="rejected">Відхилена</option>
+                    </select>
+                </div>
+                <div class="table-wrap">
+                    <table id="admin-requests-table">
+                        <thead><tr><th>№</th><th>Дата</th><th>Заявник</th><th>Обладнання</th><th>Проблема</th><th>Статус</th><th>Пріоритет</th><th>Дії</th></tr></thead>
+                        <tbody id="admin-requests-body"><tr><td class="table-empty" colspan="8">Завантаження заявок…</td></tr></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="users-panel" class="admin-panel hidden" role="tabpanel" aria-labelledby="users-tab">
+                <div class="panel-heading">
+                    <div><h2>Користувачі</h2><p>Переглядайте акаунти та керуйте ролями й доступом.</p></div>
+                </div>
+                <div class="filters admin-filters">
+                    <input type="search" id="users-search" placeholder="Пошук за ім’ям, поштою або ID..." aria-label="Пошук користувачів">
+                    <select id="users-filter-role" aria-label="Фільтр за роллю">
+                        <option value="">Усі ролі</option>
+                        <option value="user">Користувач</option>
+                        <option value="manager">Менеджер</option>
+                        <option value="admin">Адміністратор</option>
+                    </select>
+                </div>
+                <div class="table-wrap">
+                    <table id="admin-users-table">
+                        <thead><tr><th>Ім’я</th><th>Електронна пошта</th><th>Дата створення профілю</th><th>Роль</th><th>Дії</th></tr></thead>
+                        <tbody id="admin-users-body"><tr><td class="table-empty" colspan="5">Завантаження користувачів…</td></tr></tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+        <footer class="admin-footer">IT Support <span>•</span> Система керування заявками</footer>
+    </main>
+    <script type="module" src="../js/admin.js"></script>
+</body>
+</html>
