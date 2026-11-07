@@ -28,6 +28,14 @@
                 <option value="high">Високий</option>
                 <option value="critical">Критичний</option>
             </select>
+            <select id="manager-filter-status" aria-label="Фільтр за статусом">
+                <option value="">Усі статуси</option>
+                <option value="new">Нова</option>
+                <option value="in_progress">У роботі</option>
+                <option value="waiting">Очікування</option>
+                <option value="completed">Завершена</option>
+                <option value="rejected">Відхилена</option>
+            </select>
         </div>
         <div id="manager-message" class="message" role="status" aria-live="polite"></div>
         <table id="manager-requests-table">
@@ -39,7 +47,7 @@
                     <th>Проблема</th>
                     <th>Статус</th>
                     <th>Пріоритет</th>
-                    <th>Терміни</th>
+                    <th>Дата створення</th>
                 </tr>
             </thead>
             <tbody id="manager-requests-body">

@@ -1519,3 +1519,233 @@ tbody tr:hover {
         font-size: 0.84rem;
     }
 }
+
+.notification-widget {
+    position: relative;
+}
+
+.notification-button {
+    position: relative;
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    padding: 8px;
+    border: 1px solid rgba(237, 222, 193, 0.32);
+    border-radius: 10px;
+    background: transparent;
+    color: #fbf7ef;
+}
+
+.notification-button:hover,
+.notification-button:focus-visible {
+    background: rgba(255, 250, 241, 0.12);
+}
+
+.notification-button svg {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.notification-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    border: 2px solid #554633;
+    border-radius: 999px;
+    background: #b75b4b;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 15px;
+    text-align: center;
+}
+
+.notification-panel {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 12px);
+    right: -120px;
+    width: min(390px, calc(100vw - 24px));
+    max-height: min(520px, calc(100vh - 100px));
+    overflow-y: auto;
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    background: var(--card-bg);
+    box-shadow: 0 16px 38px rgba(40, 31, 20, 0.2);
+    color: var(--text-color);
+}
+
+.notification-panel-heading,
+.request-history-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.notification-panel-heading {
+    padding-bottom: 11px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.notification-panel-heading h2 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.notification-text-button {
+    padding: 5px 7px;
+    background: transparent;
+    color: var(--primary-color);
+    font-size: 0.76rem;
+}
+
+.notification-text-button:hover {
+    background: #f0e9dc;
+    color: var(--primary-hover);
+}
+
+.notification-list {
+    display: grid;
+    gap: 7px;
+    padding-top: 10px;
+}
+
+.notification-item {
+    display: grid;
+    width: 100%;
+    gap: 4px;
+    padding: 11px 12px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: #f7f3eb;
+    color: var(--text-color);
+    text-align: left;
+}
+
+.notification-item:hover {
+    border-color: #d7c6aa;
+    background: #f1e9db;
+}
+
+.notification-item strong {
+    font-size: 0.87rem;
+}
+
+.notification-item span {
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.notification-item time,
+.request-history-list time {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+}
+
+.notification-unread {
+    border-left: 3px solid var(--primary-color);
+    background: #f2eadc;
+}
+
+.notification-empty,
+.notification-message {
+    margin: 10px 0 0;
+    color: var(--text-muted);
+    font-size: 0.83rem;
+    font-weight: 400;
+    text-align: left;
+}
+
+.notification-message:not(.hidden) {
+    color: #9c463d;
+}
+
+.request-history-dialog {
+    width: min(520px, calc(100% - 28px));
+    max-height: min(620px, calc(100vh - 32px));
+    margin: auto;
+    padding: 22px;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    box-shadow: 0 20px 60px rgba(40, 31, 20, 0.25);
+}
+
+.request-history-dialog::backdrop {
+    background: rgba(36, 31, 24, 0.48);
+}
+
+.request-history-heading {
+    margin-bottom: 16px;
+}
+
+.request-history-heading .eyebrow {
+    margin: 0 0 3px;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+}
+
+.request-history-heading h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.request-history-list {
+    display: grid;
+    gap: 10px;
+    padding: 2px 0 0 22px;
+}
+
+.request-history-list li {
+    padding: 0 0 8px 4px;
+}
+
+.request-history-list strong,
+.request-history-list time {
+    display: block;
+}
+
+.request-history-list strong {
+    font-size: 0.9rem;
+}
+
+.request-highlight {
+    animation: request-highlight 1.8s ease-out;
+}
+
+@keyframes request-highlight {
+    0%, 45% { background-color: #f0dfb8; }
+    100% { background-color: transparent; }
+}
+
+@media (max-width: 560px) {
+    .notification-panel {
+        right: -105px;
+    }
+
+    .notification-panel-heading {
+        align-items: flex-start;
+    }
+
+    .notification-text-button {
+        max-width: 150px;
+        line-height: 1.3;
+    }
+
+    .request-history-dialog {
+        padding: 18px;
+    }
+}

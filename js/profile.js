@@ -122,7 +122,7 @@ document.getElementById('profile-name-form').addEventListener('submit', async (e
     if (error) {
       const missingFunction = error.code === 'PGRST202' || error.code === '42883';
       const hint = missingFunction
-        ? ' У Supabase SQL Editor перевірте select to_regprocedure(\'public.update_my_profile(text)\'); Якщо результат NULL — виконайте supabase-update-profile.sql. Переконайтеся, що це проєкт lgudzyptpalwklbboyhh, і після запуску оновіть сторінку.'
+        ? ' У Supabase SQL Editor перевірте select to_regprocedure(\'public.update_my_profile(text)\'); Якщо результат NULL — виконайте supabase/sql/supabase-update-profile.sql. Переконайтеся, що це проєкт lgudzyptpalwklbboyhh, і після запуску оновіть сторінку.'
         : '';
       throw new Error(`Не вдалося зберегти ім’я: ${error.message}.${hint}`);
     }

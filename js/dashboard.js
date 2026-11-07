@@ -1,7 +1,15 @@
 import { supabase } from './supabase.js';
 import { clearSessionStart, escapeHtml, formatDate, showMessage } from './utils.js';
+import { initNotifications, showRequestHistory } from './notifications.js';
 
 let requests = [];
+const statusNames = {
+  new: 'Нова',
+  in_progress: 'У роботі',
+  waiting: 'Очікування',
+  completed: 'Завершена',
+  rejected: 'Відхилена'
+};
 
 async function initDashboard() {
   const { data: { user }, error } = await supabase.auth.getUser();
@@ -32,6 +40,11 @@ async function initDashboard() {
 
   document.getElementById('search-requests').addEventListener('input', filterRequests);
   document.getElementById('filter-status').addEventListener('change', filterRequests);
+  document.getElementById('user-requests-body').addEventListener('click', openRequestHistory);
+  document.getElementById('request-history-close').addEventListener('click', () => {
+    document.getElementById('request-history-dialog').close();
+  });
+  initNotifications(user.id);
   await loadRequests(user.id);
 }
 
@@ -60,19 +73,29 @@ async function loadRequests(userId) {
 function renderRequests(list) {
   const tbody = document.getElementById('user-requests-body');
   if (!list.length) {
-    tbody.innerHTML = '<tr><td class="table-empty" colspan="5">Заявок поки немає.</td></tr>';
+    tbody.innerHTML = '<tr><td class="table-empty" colspan="6">Заявок поки немає.</td></tr>';
     return;
   }
 
   tbody.innerHTML = list.map((request) => `
-    <tr>
+    <tr data-request-row="${escapeHtml(request.id)}">
       <td>${escapeHtml(request.id)}</td>
       <td>${formatDate(request.created_at)}</td>
       <td><strong>${escapeHtml(request.title)}</strong><br><small>${escapeHtml(request.description)}</small></td>
-      <td><span class="status-badge status-${escapeHtml(request.status)}">${escapeHtml(request.status)}</span></td>
+      <td><span class="status-badge status-${escapeHtml(request.status)}">${escapeHtml(statusNames[request.status] || request.status)}</span></td>
       <td>${escapeHtml(request.admin_comment || '—')}</td>
+      <td><button class="button-secondary button-small" type="button" data-history-id="${escapeHtml(request.id)}" data-history-title="${escapeHtml(request.title)}">Історія</button></td>
     </tr>
   `).join('');
+}
+
+function openRequestHistory(event) {
+  const button = event.target.closest('[data-history-id]');
+  if (!button) return;
+  showRequestHistory(button.dataset.historyId, button.dataset.historyTitle)
+    .catch((error) => {
+      showMessage(document.getElementById('dashboard-message'), `Не вдалося завантажити історію: ${error.message}`, true);
+    });
 }
 
 function filterRequests() {

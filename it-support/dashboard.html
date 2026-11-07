@@ -11,6 +11,20 @@
         <h1>IT Support</h1>
         <div class="user-info">
             <span id="user-name">Користувач</span>
+            <div class="notification-widget">
+                <button id="notifications-button" class="notification-button" type="button" aria-label="Сповіщення" aria-expanded="false" aria-controls="notifications-panel">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+                    <span id="notifications-count" class="notification-count hidden"></span>
+                </button>
+                <section id="notifications-panel" class="notification-panel hidden" aria-label="Сповіщення">
+                    <div class="notification-panel-heading">
+                        <h2>Сповіщення</h2>
+                        <button id="notifications-mark-all" class="notification-text-button" type="button">Позначити всі прочитаними</button>
+                    </div>
+                    <p id="notifications-message" class="notification-message hidden" role="status"></p>
+                    <div id="notifications-list" class="notification-list"></div>
+                </section>
+            </div>
             <a class="profile-link" href="profile.html">Профіль</a>
             <button id="logout-btn">Вийти</button>
         </div>
@@ -41,6 +55,7 @@
                     <th>Назва / Проблема</th>
                     <th>Статус</th>
                     <th>Коментар адміна</th>
+                    <th>Історія</th>
                 </tr>
             </thead>
             <tbody id="user-requests-body">
@@ -48,6 +63,14 @@
             </tbody>
         </table>
     </main>
+    <dialog id="request-history-dialog" class="request-history-dialog" aria-labelledby="request-history-title">
+        <div class="request-history-heading">
+            <div><p class="eyebrow">ІСТОРІЯ ЗМІН</p><h2 id="request-history-title">Заявка</h2></div>
+            <button id="request-history-close" class="button-secondary button-small" type="button">Закрити</button>
+        </div>
+        <p id="request-history-message" class="notification-message hidden" role="status"></p>
+        <ol id="request-history-list" class="request-history-list"></ol>
+    </dialog>
     <script type="module" src="../js/dashboard.js"></script>
 </body>
 </html>

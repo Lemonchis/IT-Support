@@ -142,3 +142,5 @@ create policy "Admins can manage repair requests"
   to authenticated
   using ((select public.is_admin()))
   with check ((select public.is_admin()));
+
+notify pgrst, 'reload schema';

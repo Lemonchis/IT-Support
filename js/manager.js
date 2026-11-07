@@ -7,6 +7,14 @@ const priorityNames = {
   high: 'Високий',
   critical: 'Критичний'
 };
+const requestStatuses = [
+  ['new', 'Нова'],
+  ['in_progress', 'У роботі'],
+  ['waiting', 'Очікування'],
+  ['completed', 'Завершена'],
+  ['rejected', 'Відхилена']
+];
+let requests = [];
 
 async function initManager() {
   const { data: { user }, error } = await supabase.auth.getUser();
@@ -29,7 +37,10 @@ async function initManager() {
 
   document.getElementById('manager-name').textContent = profile.full_name || user.email || 'Менеджер';
   document.getElementById('logout-btn').addEventListener('click', () => logOut(user.id));
-  document.getElementById('manager-requests-body').addEventListener('change', updatePriority);
+  document.getElementById('manager-requests-body').addEventListener('change', updateRequest);
+  document.getElementById('manager-search').addEventListener('input', renderRequests);
+  document.getElementById('manager-filter-priority').addEventListener('change', renderRequests);
+  document.getElementById('manager-filter-status').addEventListener('change', renderRequests);
   await loadManagerData();
 }
 
@@ -55,25 +66,42 @@ async function loadManagerData() {
     return;
   }
 
-  renderRequests(data || []);
+  requests = data || [];
+  renderRequests();
 }
 
-function renderRequests(requests) {
+function renderRequests() {
   const tbody = document.getElementById('manager-requests-body');
-  if (!requests.length) {
+  const search = document.getElementById('manager-search').value.trim().toLocaleLowerCase('uk');
+  const priority = document.getElementById('manager-filter-priority').value;
+  const status = document.getElementById('manager-filter-status').value;
+  const filtered = requests.filter((request) => {
+    const text = `${request.id} ${request.profiles?.full_name || ''} ${request.title || ''}`
+      .toLocaleLowerCase('uk');
+    return text.includes(search)
+      && (!priority || request.priority === priority)
+      && (!status || request.status === status);
+  });
+  if (!filtered.length) {
     tbody.innerHTML = '<tr><td class="table-empty" colspan="7">Заявок поки немає.</td></tr>';
     return;
   }
 
-  tbody.innerHTML = requests.map((request) => `
+  tbody.innerHTML = filtered.map((request) => `
     <tr>
       <td>${escapeHtml(request.id)}</td>
       <td>${formatDate(request.created_at)}</td>
       <td>${escapeHtml(request.profiles?.full_name || 'Невідомо')}</td>
       <td>${escapeHtml(request.title)}</td>
-      <td><span class="status-badge status-${escapeHtml(request.status)}">${escapeHtml(request.status)}</span></td>
       <td>
-        <select data-request-id="${escapeHtml(request.id)}" aria-label="Пріоритет заявки ${escapeHtml(request.id)}">
+        <select data-status-id="${escapeHtml(request.id)}" aria-label="Статус заявки ${escapeHtml(request.id)}">
+          ${requestStatuses.map(([value, name]) =>
+            `<option value="${value}" ${request.status === value ? 'selected' : ''}>${name}</option>`
+          ).join('')}
+        </select>
+      </td>
+      <td>
+        <select data-priority-id="${escapeHtml(request.id)}" aria-label="Пріоритет заявки ${escapeHtml(request.id)}">
           ${Object.entries(priorityNames).map(([value, name]) =>
             `<option value="${value}" ${request.priority === value ? 'selected' : ''}>${name}</option>`
           ).join('')}
@@ -84,24 +112,35 @@ function renderRequests(requests) {
   `).join('');
 }
 
-async function updatePriority(event) {
-  const select = event.target.closest('[data-request-id]');
+async function updateRequest(event) {
+  const select = event.target.closest('[data-priority-id], [data-status-id]');
   if (!select) return;
 
+  const isStatus = select.hasAttribute('data-status-id');
+  const request = requests.find((item) => item.id === (isStatus ? select.dataset.statusId : select.dataset.priorityId));
+  const field = isStatus ? 'status' : 'priority';
+  const oldValue = request?.[field];
   select.disabled = true;
   try {
-    const { error } = await supabase
-      .from('repair_requests')
-      .update({ priority: select.value })
-      .eq('id', select.dataset.requestId);
+    const result = isStatus
+      ? await supabase.rpc('update_request_status', {
+        p_request_id: select.dataset.statusId,
+        p_status: select.value
+      })
+      : await supabase
+        .from('repair_requests')
+        .update({ priority: select.value })
+        .eq('id', select.dataset.priorityId);
+    const { error } = result;
     if (error) throw error;
   } catch (error) {
     select.disabled = false;
-    showMessage(document.getElementById('manager-message'), `Не вдалося змінити пріоритет: ${error.message}`, true);
+    select.value = oldValue;
+    showMessage(document.getElementById('manager-message'), `Не вдалося змінити ${isStatus ? 'статус' : 'пріоритет'}: ${error.message}`, true);
     return;
   }
 
-  showMessage(document.getElementById('manager-message'), 'Пріоритет заявки оновлено.');
+  showMessage(document.getElementById('manager-message'), `${isStatus ? 'Статус' : 'Пріоритет'} заявки оновлено.`);
   await loadManagerData();
 }
 
