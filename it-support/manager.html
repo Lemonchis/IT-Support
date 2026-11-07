@@ -6,62 +6,114 @@
     <title>Панель Менеджера | IT Support</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
-<body>
-    <header>
-        <h1>Панель Менеджера</h1>
+<body class="manager-page">
+    <header class="app-header manager-header">
+        <a class="brand" href="manager.html" aria-label="IT Support — панель менеджера">
+            <span class="brand-mark">IT</span>
+            <span><strong>IT Support</strong><small>Панель менеджера</small></span>
+        </a>
         <div class="user-info">
             <span id="manager-name">Менеджер</span>
             <a class="profile-link" href="profile.html">Профіль</a>
-            <button id="logout-btn">Вийти</button>
+            <button id="logout-btn" class="button-secondary" type="button">Вийти</button>
         </div>
     </header>
-    <main class="container-fluid">
-        <div class="dashboard-controls">
-            <h2>Контроль виконання заявок</h2>
-            <button id="manager-export-report" type="button">Завантажити звіт CSV</button>
-        </div>
-        <section class="stats manager-stats" aria-label="Статистика заявок">
-            <article class="stat-card"><span class="stat-label">Усього заявок</span><strong id="manager-stat-total">0</strong></article>
-            <article class="stat-card"><span class="stat-label">Нові</span><strong id="manager-stat-new">0</strong></article>
-            <article class="stat-card"><span class="stat-label">У роботі / очікують</span><strong id="manager-stat-active">0</strong></article>
-            <article class="stat-card"><span class="stat-label">Прострочені</span><strong id="manager-stat-overdue">0</strong></article>
-            <article class="stat-card"><span class="stat-label">Завершені</span><strong id="manager-stat-completed">0</strong></article>
+    <main class="manager-layout">
+        <section class="manager-welcome">
+            <div>
+                <p class="eyebrow">КОНТРОЛЬ РЕМОНТІВ</p>
+                <h1>Заявки та виконання</h1>
+                <p>Відстежуйте пріоритети, статуси та терміни робіт.</p>
+            </div>
+            <button id="manager-export-report" class="manager-export-button" type="button">
+                <span aria-hidden="true">↓</span> Завантажити звіт CSV
+            </button>
         </section>
-        <div class="filters">
-            <input type="text" id="manager-search" placeholder="Пошук заявок...">
-            <select id="manager-filter-priority">
-                <option value="">Всі пріоритети</option>
-                <option value="low">Низький</option>
-                <option value="medium">Середній</option>
-                <option value="high">Високий</option>
-                <option value="critical">Критичний</option>
-            </select>
-            <select id="manager-filter-status" aria-label="Фільтр за статусом">
-                <option value="">Усі статуси</option>
+
+        <section class="stats manager-stats" aria-label="Статистика заявок">
+            <article class="manager-stat-card"><span class="manager-stat-label">Усього заявок</span><strong id="manager-stat-total">0</strong></article>
+            <article class="manager-stat-card"><span class="manager-stat-label">Нові</span><strong id="manager-stat-new">0</strong></article>
+            <article class="manager-stat-card"><span class="manager-stat-label">У роботі / очікують</span><strong id="manager-stat-active">0</strong></article>
+            <article class="manager-stat-card manager-stat-overdue"><span class="manager-stat-label">Прострочені</span><strong id="manager-stat-overdue">0</strong></article>
+            <article class="manager-stat-card"><span class="manager-stat-label">Завершені</span><strong id="manager-stat-completed">0</strong></article>
+        </section>
+
+        <section class="manager-workspace" aria-labelledby="manager-requests-title">
+            <div class="manager-workspace-heading">
+                <div>
+                    <h2 id="manager-requests-title">Усі заявки</h2>
+                    <p>Пошук, контроль стану та планування термінів.</p>
+                </div>
+            </div>
+            <div class="filters manager-filters">
+                <input type="search" id="manager-search" placeholder="Пошук за номером, заявником або проблемою..." aria-label="Пошук заявок">
+                <select id="manager-filter-status" aria-label="Фільтр за статусом">
+                    <option value="">Усі статуси</option>
+                    <option value="new">Нова</option>
+                    <option value="in_progress">У роботі</option>
+                    <option value="waiting">Очікування</option>
+                    <option value="completed">Завершена</option>
+                    <option value="rejected">Відхилена</option>
+                </select>
+                <select id="manager-filter-priority" aria-label="Фільтр за пріоритетом">
+                    <option value="">Усі пріоритети</option>
+                    <option value="low">Низький</option>
+                    <option value="medium">Середній</option>
+                    <option value="high">Високий</option>
+                    <option value="critical">Критичний</option>
+                </select>
+            </div>
+            <div id="manager-message" class="admin-message hidden" role="status" aria-live="polite"></div>
+            <div id="manager-loading" class="manager-loading">Завантаження заявок…</div>
+            <div class="table-wrap manager-table-wrap">
+                <table id="manager-requests-table">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Створено</th>
+                            <th>Заявник</th>
+                            <th>Проблема</th>
+                            <th>Статус</th>
+                            <th>Пріоритет</th>
+                            <th>Термін виконання</th>
+                            <th>Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody id="manager-requests-body"></tbody>
+                </table>
+            </div>
+        </section>
+        <footer class="admin-footer">IT Support <span>•</span> Панель контролю ремонтів</footer>
+    </main>
+    <dialog id="manager-request-dialog" class="request-history-dialog" aria-labelledby="manager-request-dialog-title">
+        <form id="manager-request-form" class="request-work-form">
+            <div class="request-history-heading">
+                <div><p class="eyebrow">КЕРУВАННЯ ЗАЯВКОЮ</p><h2 id="manager-request-dialog-title">Заявка</h2></div>
+                <button id="manager-request-close" class="button-secondary button-small" type="button">Закрити</button>
+            </div>
+            <label for="manager-request-status">Статус</label>
+            <select id="manager-request-status">
                 <option value="new">Нова</option>
                 <option value="in_progress">У роботі</option>
                 <option value="waiting">Очікування</option>
                 <option value="completed">Завершена</option>
                 <option value="rejected">Відхилена</option>
             </select>
-        </div>
-        <div id="manager-message" class="message" role="status" aria-live="polite"></div>
-        <div id="manager-loading" class="loading-indicator">Завантаження заявок…</div>
-        <table id="manager-requests-table">
-            <thead>
-                <tr>
-                    <th>№</th>
-                    <th>Дата</th>
-                    <th>Заявник</th>
-                    <th>Проблема</th>
-                    <th>Статус</th>
-                    <th>Пріоритет</th>
-                    <th>Термін виконання</th>
-                </tr>
-            </thead>
-            <tbody id="manager-requests-body"></tbody>
-        </table>
-    </main>
+            <label for="manager-request-priority">Пріоритет</label>
+            <select id="manager-request-priority">
+                <option value="low">Низький</option>
+                <option value="medium">Середній</option>
+                <option value="high">Високий</option>
+                <option value="critical">Критичний</option>
+            </select>
+            <label for="manager-request-due">Термін виконання</label>
+            <input id="manager-request-due" type="datetime-local">
+            <p id="manager-request-form-message" class="notification-message hidden" role="status"></p>
+            <div class="request-work-actions">
+                <button id="manager-request-save" type="submit">Зберегти зміни</button>
+            </div>
+        </form>
+    </dialog>
     <script type="module" src="../js/manager.js"></script>
 </body>
 </html>

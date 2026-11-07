@@ -16,6 +16,7 @@ const requestStatuses = [
 ];
 const statusNames = Object.fromEntries(requestStatuses);
 let requests = [];
+let editingRequest;
 
 function toLocalDateTime(value) {
   if (!value) return '';
@@ -46,7 +47,11 @@ async function initManager() {
 
   document.getElementById('manager-name').textContent = profile.full_name || user.email || 'Менеджер';
   document.getElementById('logout-btn').addEventListener('click', () => logOut(user.id));
-  document.getElementById('manager-requests-body').addEventListener('change', updateRequest);
+  document.getElementById('manager-requests-body').addEventListener('click', openRequestEditor);
+  document.getElementById('manager-request-form').addEventListener('submit', saveRequestChanges);
+  document.getElementById('manager-request-close').addEventListener('click', () => {
+    document.getElementById('manager-request-dialog').close();
+  });
   document.getElementById('manager-search').addEventListener('input', renderRequests);
   document.getElementById('manager-filter-priority').addEventListener('change', renderRequests);
   document.getElementById('manager-filter-status').addEventListener('change', renderRequests);
@@ -104,7 +109,7 @@ function renderRequests() {
   const tbody = document.getElementById('manager-requests-body');
   const filtered = getFilteredRequests();
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td class="table-empty" colspan="7">Заявок за цими умовами не знайдено.</td></tr>';
+    tbody.innerHTML = '<tr><td class="table-empty" colspan="8">Заявок за цими умовами не знайдено.</td></tr>';
     return;
   }
 
@@ -115,27 +120,13 @@ function renderRequests() {
       <td>${escapeHtml(request.profiles?.full_name || 'Невідомо')}</td>
       <td>${escapeHtml(request.title)}</td>
       <td>
-        <select data-status-id="${escapeHtml(request.id)}" aria-label="Статус заявки ${escapeHtml(request.id)}">
-          ${requestStatuses.map(([value, name]) =>
-            `<option value="${value}" ${request.status === value ? 'selected' : ''}>${name}</option>`
-          ).join('')}
-        </select>
+        <span class="status-badge status-${escapeHtml(request.status)}">${escapeHtml(statusNames[request.status] || request.status)}</span>
       </td>
-      <td>
-        <select data-priority-id="${escapeHtml(request.id)}" aria-label="Пріоритет заявки ${escapeHtml(request.id)}">
-          ${Object.entries(priorityNames).map(([value, name]) =>
-            `<option value="${value}" ${request.priority === value ? 'selected' : ''}>${name}</option>`
-          ).join('')}
-        </select>
-      </td>
-      <td>
-        <input type="datetime-local" data-due-id="${escapeHtml(request.id)}"
-          aria-label="Термін виконання заявки ${escapeHtml(request.id)}"
-          value="${toLocalDateTime(request.due_at)}">
-        ${request.due_at && new Date(request.due_at).getTime() < Date.now() && !['completed', 'rejected'].includes(request.status)
-          ? '<small class="deadline-overdue">Прострочено</small>'
-          : ''}
-      </td>
+      <td><span class="manager-priority manager-priority-${escapeHtml(request.priority)}">${escapeHtml(priorityNames[request.priority] || request.priority)}</span></td>
+      <td>${request.due_at
+        ? `<span class="${request.due_at && new Date(request.due_at).getTime() < Date.now() && !['completed', 'rejected'].includes(request.status) ? 'manager-deadline-overdue' : 'manager-deadline'}">${formatDate(request.due_at, true)}</span>`
+        : '<span class="manager-no-deadline">Не встановлено</span>'}</td>
+      <td><button class="manager-row-action" type="button" data-edit-request="${escapeHtml(request.id)}">Керувати</button></td>
     </tr>
   `).join('');
 }
@@ -145,7 +136,14 @@ function getFilteredRequests() {
   const priority = document.getElementById('manager-filter-priority').value;
   const status = document.getElementById('manager-filter-status').value;
   return requests.filter((request) => {
-    const text = `${request.id} ${request.profiles?.full_name || ''} ${request.title || ''}`
+    const text = [
+      request.id,
+      request.profiles?.full_name,
+      request.title,
+      request.equipment_type,
+      request.inventory_number,
+      request.location
+    ].filter(Boolean).join(' ')
       .toLocaleLowerCase('uk');
     return text.includes(search)
       && (!priority || request.priority === priority)
@@ -176,44 +174,51 @@ function exportReport() {
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-async function updateRequest(event) {
-  const select = event.target.closest('[data-priority-id], [data-status-id], [data-due-id]');
-  if (!select) return;
+function openRequestEditor(event) {
+  const button = event.target.closest('[data-edit-request]');
+  if (!button) return;
 
-  const isStatus = select.hasAttribute('data-status-id');
-  const isDueDate = select.hasAttribute('data-due-id');
-  const requestId = isStatus ? select.dataset.statusId : isDueDate ? select.dataset.dueId : select.dataset.priorityId;
-  const request = requests.find((item) => String(item.id) === requestId);
-  const field = isStatus ? 'status' : isDueDate ? 'due_at' : 'priority';
-  const oldValue = request?.[field];
-  select.disabled = true;
+  editingRequest = requests.find((request) => String(request.id) === button.dataset.editRequest);
+  if (!editingRequest) return;
+
+  document.getElementById('manager-request-dialog-title').textContent = `Заявка №${editingRequest.id}`;
+  document.getElementById('manager-request-status').value = editingRequest.status;
+  document.getElementById('manager-request-priority').value = editingRequest.priority;
+  document.getElementById('manager-request-due').value = toLocalDateTime(editingRequest.due_at);
+  document.getElementById('manager-request-form-message').classList.add('hidden');
+  document.getElementById('manager-request-dialog').showModal();
+}
+
+async function saveRequestChanges(event) {
+  event.preventDefault();
+  if (!editingRequest) return;
+
+  const saveButton = document.getElementById('manager-request-save');
+  const message = document.getElementById('manager-request-form-message');
+  saveButton.disabled = true;
+  const status = document.getElementById('manager-request-status').value;
+  const priority = document.getElementById('manager-request-priority').value;
+  const dueValue = document.getElementById('manager-request-due').value;
+  const dueAt = dueValue ? new Date(dueValue).toISOString() : null;
   try {
-    const result = isStatus
-      ? await supabase.rpc('update_request_status', {
-        p_request_id: select.dataset.statusId,
-        p_status: select.value
-      })
-      : isDueDate
-        ? await supabase
-          .from('repair_requests')
-          .update({ due_at: select.value ? new Date(select.value).toISOString() : null })
-          .eq('id', select.dataset.dueId)
-      : await supabase
-        .from('repair_requests')
-        .update({ priority: select.value })
-        .eq('id', select.dataset.priorityId);
-    const { error } = result;
+    const { error } = await supabase
+      .from('repair_requests')
+      .update({ status, priority, due_at: dueAt })
+      .eq('id', editingRequest.id);
     if (error) throw error;
   } catch (error) {
-    select.disabled = false;
-    select.value = isDueDate ? toLocalDateTime(oldValue) : oldValue;
-    const fieldName = isStatus ? 'статус' : isDueDate ? 'термін' : 'пріоритет';
-    showMessage(document.getElementById('manager-message'), `Не вдалося змінити ${fieldName}: ${error.message}`, true);
-    return;
+    message.textContent = `Не вдалося оновити заявку: ${error.message}`;
+    message.classList.remove('hidden');
+  } finally {
+    saveButton.disabled = false;
   }
 
-  const fieldName = isStatus ? 'Статус' : isDueDate ? 'Термін' : 'Пріоритет';
-  showMessage(document.getElementById('manager-message'), `${fieldName} заявки оновлено.`);
+  if (message.classList.contains('hidden')) {
+    document.getElementById('manager-request-dialog').close();
+    showMessage(document.getElementById('manager-message'), 'Зміни заявки збережено.');
+  } else {
+    return;
+  }
   await loadManagerData();
 }
 
