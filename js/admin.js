@@ -14,10 +14,17 @@ const userRoles = [
   ['manager', 'Менеджер'],
   ['admin', 'Адміністратор']
 ];
+const priorityNames = {
+  low: 'Низький',
+  medium: 'Середній',
+  high: 'Високий',
+  critical: 'Критичний'
+};
 
 let requests = [];
 let users = [];
 let adminId;
+let editingRequestId;
 
 const adminMessage = document.getElementById('admin-message');
 
@@ -58,6 +65,9 @@ function connectTabs() {
 function connectFilters() {
   document.getElementById('admin-search').addEventListener('input', renderRequests);
   document.getElementById('admin-filter-status').addEventListener('change', renderRequests);
+  document.getElementById('admin-filter-priority').addEventListener('change', renderRequests);
+  document.getElementById('admin-filter-date-from').addEventListener('change', renderRequests);
+  document.getElementById('admin-filter-date-to').addEventListener('change', renderRequests);
   document.getElementById('users-search').addEventListener('input', renderUsers);
   document.getElementById('users-filter-role').addEventListener('change', renderUsers);
 }
@@ -67,7 +77,11 @@ function connectTableActions() {
   const userTable = document.getElementById('admin-users-body');
 
   requestTable.addEventListener('change', updateRequestStatus);
-  requestTable.addEventListener('click', editRequestComment);
+  requestTable.addEventListener('click', editRequestDetails);
+  document.getElementById('request-work-form').addEventListener('submit', saveRequestDetails);
+  document.getElementById('request-work-close').addEventListener('click', () => {
+    document.getElementById('request-work-dialog').close();
+  });
   userTable.addEventListener('change', updateUserRole);
   userTable.addEventListener('click', deleteUser);
 }
@@ -97,7 +111,7 @@ function showTab(name) {
 async function loadRequests() {
   const { data, error } = await supabase
     .from('repair_requests')
-    .select('*, profiles(full_name)')
+    .select('*, profiles(full_name, email)')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -139,15 +153,24 @@ function updateStats() {
 function renderRequests() {
   const search = document.getElementById('admin-search').value.trim().toLocaleLowerCase('uk');
   const status = document.getElementById('admin-filter-status').value;
+  const priority = document.getElementById('admin-filter-priority').value;
+  const dateFrom = document.getElementById('admin-filter-date-from').value;
+  const dateTo = document.getElementById('admin-filter-date-to').value;
   const filtered = requests.filter((request) => {
     const text = [
       request.id,
       request.profiles?.full_name,
+      request.profiles?.email,
       request.title,
       request.equipment_type
     ].join(' ').toLocaleLowerCase('uk');
 
-    return text.includes(search) && (!status || request.status === status);
+    const requestDate = request.created_at ? request.created_at.slice(0, 10) : '';
+    return text.includes(search)
+      && (!status || request.status === status)
+      && (!priority || request.priority === priority)
+      && (!dateFrom || requestDate >= dateFrom)
+      && (!dateTo || requestDate <= dateTo);
   });
 
   const rows = filtered.map((request) => `
@@ -164,8 +187,8 @@ function renderRequests() {
           `).join('')}
         </select>
       </td>
-      <td><span class="priority-badge priority-${escapeHtml(request.priority)}">${escapeHtml(request.priority)}</span></td>
-      <td><button class="button-secondary button-small" type="button" data-comment-id="${escapeHtml(request.id)}">Коментар</button></td>
+      <td><span class="priority-badge priority-${escapeHtml(request.priority)}">${escapeHtml(priorityNames[request.priority] || request.priority)}</span></td>
+      <td><button class="button-secondary button-small" type="button" data-work-details-id="${escapeHtml(request.id)}">Робочі деталі</button></td>
     </tr>
   `);
 
@@ -211,10 +234,20 @@ function renderUsers() {
     rows.join('') || '<tr><td class="table-empty" colspan="5">Користувачів за цими умовами не знайдено.</td></tr>';
 }
 
+function toLocalDateTime(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 16);
+}
+
 async function updateRequestStatus(event) {
   const select = event.target.closest('[data-status-id]');
   if (!select) return;
 
+  const request = requests.find((item) => String(item.id) === select.dataset.statusId);
+  const previousStatus = request?.status;
   select.disabled = true;
   try {
     const { error } = await supabase
@@ -224,6 +257,7 @@ async function updateRequestStatus(event) {
     if (error) throw error;
   } catch (error) {
     select.disabled = false;
+    select.value = previousStatus;
     showMessage(adminMessage, `Не вдалося змінити статус: ${error.message}`, true);
     return;
   }
@@ -232,25 +266,64 @@ async function updateRequestStatus(event) {
   await loadRequests();
 }
 
-async function editRequestComment(event) {
-  const button = event.target.closest('[data-comment-id]');
+function editRequestDetails(event) {
+  const button = event.target.closest('[data-work-details-id]');
   if (!button) return;
 
-  const comment = window.prompt('Введіть коментар адміністратора:');
-  if (comment === null) return;
+  const request = requests.find((item) => String(item.id) === button.dataset.workDetailsId);
+  if (!request) return;
+
+  editingRequestId = request.id;
+  document.getElementById('request-work-title').textContent = `Заявка №${request.id}`;
+  document.getElementById('request-fault-cause').value = request.fault_cause || '';
+  document.getElementById('request-resolution').value = request.resolution || '';
+  document.getElementById('request-work-description').value = request.description || '';
+  document.getElementById('request-work-equipment').value = [
+    request.equipment_type,
+    request.inventory_number ? `Інв. № ${request.inventory_number}` : '',
+    request.location
+  ].filter(Boolean).join(' · ');
+  document.getElementById('request-work-contact').value = [
+    request.profiles?.email,
+    request.contact_phone
+  ].filter(Boolean).join(' · ') || 'Не вказано';
+  document.getElementById('request-due-at').value = toLocalDateTime(request.due_at);
+  document.getElementById('request-admin-comment').value = request.admin_comment || '';
+  document.getElementById('request-work-message').classList.add('hidden');
+  document.getElementById('request-work-dialog').showModal();
+}
+
+async function saveRequestDetails(event) {
+  event.preventDefault();
+  const saveButton = document.getElementById('request-work-save');
+  const message = document.getElementById('request-work-message');
+  saveButton.disabled = true;
+
+  const dueAt = document.getElementById('request-due-at').value;
+  const updates = {
+    fault_cause: document.getElementById('request-fault-cause').value.trim() || null,
+    resolution: document.getElementById('request-resolution').value.trim() || null,
+    due_at: dueAt ? new Date(dueAt).toISOString() : null,
+    admin_comment: document.getElementById('request-admin-comment').value.trim() || null
+  };
 
   try {
     const { error } = await supabase
       .from('repair_requests')
-      .update({ admin_comment: comment.trim() || null })
-      .eq('id', button.dataset.commentId);
+      .update(updates)
+      .eq('id', editingRequestId);
     if (error) throw error;
-  } catch (error) {
-    showMessage(adminMessage, `Не вдалося зберегти коментар: ${error.message}`, true);
-    return;
-  }
 
-  showMessage(adminMessage, 'Коментар до заявки збережено.');
+    Object.assign(requests.find((request) => request.id === editingRequestId), updates);
+    document.getElementById('request-work-dialog').close();
+    showMessage(adminMessage, 'Робочі деталі заявки збережено.');
+    renderRequests();
+  } catch (error) {
+    message.textContent = `Не вдалося зберегти робочі деталі: ${error.message}`;
+    message.classList.remove('hidden');
+  } finally {
+    saveButton.disabled = false;
+  }
 }
 
 async function updateUserRole(event) {

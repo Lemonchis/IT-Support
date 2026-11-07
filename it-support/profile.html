@@ -56,12 +56,14 @@
             <article class="profile-card">
                 <div class="profile-section-heading">
                     <span class="profile-section-icon" aria-hidden="true">✎</span>
-                    <div><h2>Особисті дані</h2><p>Ім’я, яке відображається в заявках</p></div>
+                    <div><h2>Особисті дані</h2><p>Контактна інформація у заявках</p></div>
                 </div>
                 <form id="profile-name-form" class="profile-form">
                     <label for="profile-full-name">Ім’я та прізвище</label>
                     <input type="text" id="profile-full-name" maxlength="100" autocomplete="name" required>
-                    <button class="profile-action-button" type="submit">Зберегти ім’я</button>
+                    <label for="profile-phone">Контактний телефон</label>
+                    <input type="tel" id="profile-phone" maxlength="30" autocomplete="tel">
+                    <button class="profile-action-button" type="submit">Зберегти дані</button>
                 </form>
             </article>
 

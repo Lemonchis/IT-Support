@@ -1749,3 +1749,67 @@ tbody tr:hover {
         padding: 18px;
     }
 }
+
+.manager-stats {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    margin: 18px 0 24px;
+}
+
+.manager-stats .stat-card {
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+.manager-stats .stat-card strong {
+    color: var(--primary-color);
+    font-size: 1.6rem;
+}
+
+#manager-export-report {
+    white-space: nowrap;
+}
+
+#manager-requests-table input[type="datetime-local"] {
+    min-width: 190px;
+    padding: 7px;
+    font-size: 0.82rem;
+}
+
+.deadline-overdue {
+    display: block;
+    margin-top: 3px;
+    color: #a1483c;
+    font-weight: 700;
+}
+
+.request-work-form {
+    gap: 10px;
+}
+
+.request-work-form label {
+    margin-top: 4px;
+}
+
+.request-work-form textarea[readonly],
+.request-work-form input[readonly] {
+    background: #f5f0e6;
+    color: #625846;
+}
+
+.request-work-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-controls {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #manager-export-report {
+        width: 100%;
+    }
+}

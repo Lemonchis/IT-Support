@@ -61,7 +61,7 @@ async function loadProfile() {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('full_name, email, role, created_at')
+    .select('full_name, email, phone, role, created_at')
     .eq('id', user.id)
     .single();
   if (error) throw new Error(`Не вдалося завантажити профіль: ${error.message}`);
@@ -78,6 +78,7 @@ async function loadProfile() {
   document.getElementById('profile-created-at').textContent = formatDate(profile.created_at || user.created_at, true);
   document.getElementById('profile-last-login').textContent = formatDate(user.last_sign_in_at, true);
   document.getElementById('profile-full-name').value = profile.full_name || '';
+  document.getElementById('profile-phone').value = profile.phone || '';
 
   const homePage = profile.role === 'admin'
     ? 'admin.html'
@@ -110,6 +111,7 @@ document.getElementById('profile-name-form').addEventListener('submit', async (e
   event.preventDefault();
   const form = event.currentTarget;
   const fullName = document.getElementById('profile-full-name').value.trim();
+  const phone = document.getElementById('profile-phone').value.trim();
   if (!fullName) {
     showMessage('Вкажіть ім’я та прізвище.', true);
     return;
@@ -118,22 +120,26 @@ document.getElementById('profile-name-form').addEventListener('submit', async (e
   setFormBusy(form, true);
   showMessage('Зберігаємо ім’я...');
   try {
-    const { error } = await supabase.rpc('update_my_profile', { p_full_name: fullName });
+    const { error } = await supabase.rpc('update_my_contact', {
+      p_full_name: fullName,
+      p_phone: phone || null
+    });
     if (error) {
       const missingFunction = error.code === 'PGRST202' || error.code === '42883';
       const hint = missingFunction
-        ? ' У Supabase SQL Editor перевірте select to_regprocedure(\'public.update_my_profile(text)\'); Якщо результат NULL — виконайте supabase/sql/supabase-update-profile.sql. Переконайтеся, що це проєкт lgudzyptpalwklbboyhh, і після запуску оновіть сторінку.'
+        ? ' У Supabase SQL Editor виконайте supabase/sql/supabase-work-order-fields.sql, щоб створити функцію оновлення контактних даних.'
         : '';
-      throw new Error(`Не вдалося зберегти ім’я: ${error.message}.${hint}`);
+      throw new Error(`Не вдалося зберегти дані: ${error.message}.${hint}`);
     }
 
     profile.full_name = fullName;
+    profile.phone = phone || null;
     document.getElementById('profile-header-name').textContent = fullName;
     document.getElementById('profile-heading').textContent = fullName;
     document.getElementById('profile-avatar').textContent = fullName.slice(0, 1).toLocaleUpperCase('uk');
-    showMessage('Ім’я успішно оновлено.');
+    showMessage('Контактні дані успішно оновлено.');
   } catch (error) {
-    showMessage(`Не вдалося зберегти ім’я: ${error.message}`, true);
+    showMessage(`Не вдалося зберегти дані: ${error.message}`, true);
   } finally {
     setFormBusy(form, false);
   }

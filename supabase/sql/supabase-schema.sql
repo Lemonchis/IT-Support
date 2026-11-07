@@ -2,6 +2,7 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   full_name text not null default '',
   email text,
+  phone text,
   role text not null default 'user' check (role in ('user', 'manager', 'admin')),
   created_at timestamptz not null default now()
 );
@@ -35,6 +36,7 @@ revoke all on function public.handle_new_user() from public, anon, authenticated
 alter table public.profiles
   add column if not exists full_name text not null default '',
   add column if not exists email text,
+  add column if not exists phone text,
   add column if not exists role text not null default 'user',
   add column if not exists created_at timestamptz not null default now();
 

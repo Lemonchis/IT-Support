@@ -51,6 +51,8 @@
                 </div>
                 <div class="filters admin-filters">
                     <input type="search" id="admin-search" placeholder="Пошук за номером, автором чи назвою..." aria-label="Пошук заявок">
+                    <input type="date" id="admin-filter-date-from" aria-label="Заявки з дати">
+                    <input type="date" id="admin-filter-date-to" aria-label="Заявки до дати">
                     <select id="admin-filter-status" aria-label="Фільтр за статусом">
                         <option value="">Усі статуси</option>
                         <option value="new">Нова</option>
@@ -58,6 +60,13 @@
                         <option value="waiting">Очікування</option>
                         <option value="completed">Завершена</option>
                         <option value="rejected">Відхилена</option>
+                    </select>
+                    <select id="admin-filter-priority" aria-label="Фільтр за пріоритетом">
+                        <option value="">Усі пріоритети</option>
+                        <option value="low">Низький</option>
+                        <option value="medium">Середній</option>
+                        <option value="high">Високий</option>
+                        <option value="critical">Критичний</option>
                     </select>
                 </div>
                 <div class="table-wrap">
@@ -91,6 +100,32 @@
         </section>
         <footer class="admin-footer">IT Support <span>•</span> Система керування заявками</footer>
     </main>
+    <dialog id="request-work-dialog" class="request-history-dialog" aria-labelledby="request-work-title">
+        <form id="request-work-form" class="request-work-form">
+            <div class="request-history-heading">
+                <div><p class="eyebrow">РОБОЧІ ДЕТАЛІ</p><h2 id="request-work-title">Заявка</h2></div>
+                <button id="request-work-close" class="button-secondary button-small" type="button">Закрити</button>
+            </div>
+            <label for="request-fault-cause">Причина несправності</label>
+            <textarea id="request-fault-cause" rows="3" maxlength="2000"></textarea>
+            <label for="request-resolution">Виконані роботи та спосіб усунення</label>
+            <textarea id="request-resolution" rows="4" maxlength="4000"></textarea>
+            <label for="request-work-description">Опис проблеми від заявника</label>
+            <textarea id="request-work-description" rows="3" readonly></textarea>
+            <label for="request-work-equipment">Обладнання, інвентарний номер і місце</label>
+            <input id="request-work-equipment" type="text" readonly>
+            <label for="request-work-contact">Контакт заявника</label>
+            <input id="request-work-contact" type="text" readonly>
+            <label for="request-due-at">Термін виконання</label>
+            <input id="request-due-at" type="datetime-local">
+            <label for="request-admin-comment">Коментар для заявника</label>
+            <textarea id="request-admin-comment" rows="3" maxlength="2000"></textarea>
+            <p id="request-work-message" class="notification-message hidden" role="status"></p>
+            <div class="request-work-actions">
+                <button id="request-work-save" type="submit">Зберегти деталі</button>
+            </div>
+        </form>
+    </dialog>
     <script type="module" src="../js/admin.js"></script>
 </body>
 </html>

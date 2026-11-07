@@ -83,7 +83,7 @@ function renderRequests(list) {
       <td>${formatDate(request.created_at)}</td>
       <td><strong>${escapeHtml(request.title)}</strong><br><small>${escapeHtml(request.description)}</small></td>
       <td><span class="status-badge status-${escapeHtml(request.status)}">${escapeHtml(statusNames[request.status] || request.status)}</span></td>
-      <td>${escapeHtml(request.admin_comment || '—')}</td>
+      <td>${escapeHtml([request.admin_comment, request.resolution].filter(Boolean).join(' · ') || '—')}</td>
       <td><button class="button-secondary button-small" type="button" data-history-id="${escapeHtml(request.id)}" data-history-title="${escapeHtml(request.title)}">Історія</button></td>
     </tr>
   `).join('');

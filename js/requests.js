@@ -8,6 +8,15 @@ form?.addEventListener('submit', async (event) => {
 
   const message = document.getElementById('create-message');
   const submitButton = form.querySelector('button[type="submit"]');
+  const title = document.getElementById('req-title').value.trim();
+  const location = document.getElementById('req-location').value.trim();
+  const description = document.getElementById('req-description').value.trim();
+  const phone = document.getElementById('req-phone').value.trim();
+  if (!title || !location || !description || !phone) {
+    showMessage(message, 'Заповніть назву, місце, опис проблеми та контактний телефон.', true);
+    return;
+  }
+
   submitButton.disabled = true;
   showMessage(message, 'Створюємо заявку...');
 
@@ -21,11 +30,12 @@ form?.addEventListener('submit', async (event) => {
 
     const request = {
       user_id: user.id,
-      title: document.getElementById('req-title').value.trim(),
+      title,
       equipment_type: document.getElementById('req-equipment').value,
       inventory_number: document.getElementById('req-inventory').value.trim() || null,
-      location: document.getElementById('req-location').value.trim(),
-      description: document.getElementById('req-description').value.trim(),
+      location,
+      description,
+      contact_phone: phone,
       status: 'new',
       priority: 'medium'
     };

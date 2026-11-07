@@ -18,7 +18,15 @@
     <main class="container-fluid">
         <div class="dashboard-controls">
             <h2>Контроль виконання заявок</h2>
+            <button id="manager-export-report" type="button">Завантажити звіт CSV</button>
         </div>
+        <section class="stats manager-stats" aria-label="Статистика заявок">
+            <article class="stat-card"><span class="stat-label">Усього заявок</span><strong id="manager-stat-total">0</strong></article>
+            <article class="stat-card"><span class="stat-label">Нові</span><strong id="manager-stat-new">0</strong></article>
+            <article class="stat-card"><span class="stat-label">У роботі / очікують</span><strong id="manager-stat-active">0</strong></article>
+            <article class="stat-card"><span class="stat-label">Прострочені</span><strong id="manager-stat-overdue">0</strong></article>
+            <article class="stat-card"><span class="stat-label">Завершені</span><strong id="manager-stat-completed">0</strong></article>
+        </section>
         <div class="filters">
             <input type="text" id="manager-search" placeholder="Пошук заявок...">
             <select id="manager-filter-priority">
@@ -38,6 +46,7 @@
             </select>
         </div>
         <div id="manager-message" class="message" role="status" aria-live="polite"></div>
+        <div id="manager-loading" class="loading-indicator">Завантаження заявок…</div>
         <table id="manager-requests-table">
             <thead>
                 <tr>
@@ -47,12 +56,10 @@
                     <th>Проблема</th>
                     <th>Статус</th>
                     <th>Пріоритет</th>
-                    <th>Дата створення</th>
+                    <th>Термін виконання</th>
                 </tr>
             </thead>
-            <tbody id="manager-requests-body">
-                <!-- Дані завантажуватимуться через JS -->
-            </tbody>
+            <tbody id="manager-requests-body"></tbody>
         </table>
     </main>
     <script type="module" src="../js/manager.js"></script>
